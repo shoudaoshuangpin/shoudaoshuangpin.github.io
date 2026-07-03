@@ -248,6 +248,8 @@
             display: flex;
             gap: 0.4rem;
             justify-content: center;
+            width: fit-content;
+            margin: 0 auto;
         }
 
         .key {
@@ -634,12 +636,14 @@
             color: #f59e0b;
         }
         .mobile-input {
-            position: absolute;
+            position: fixed;
             opacity: 0;
             width: 1px;
             height: 1px;
             pointer-events: none;
-            left: -9999px;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
 
         .mobile-keyboard-btn {
@@ -1139,6 +1143,10 @@
         practiceState.finals.combo = 0;
         document.getElementById('fStartBtn').textContent = '练习中...';
         nextFinalsQuestion();
+        // 移动端自动唤起键盘
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            focusMobileInput('finals');
+        }
     }
 
     function nextFinalsQuestion() {
@@ -1212,6 +1220,10 @@
         document.getElementById('sStartBtn').textContent = '练习中...';
         resetShuangpinSlots();
         nextShuangpinQuestion();
+        // 移动端自动唤起键盘
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            focusMobileInput('shuangpin');
+        }
     }
 
     function resetShuangpinSlots() {
@@ -1378,7 +1390,11 @@
         mobileInputMode = mode;
         const input = document.getElementById('mobileInput');
         input.value = '';
-        input.focus();
+        // 延迟聚焦，避免按钮焦点冲突，确保移动端浏览器允许弹出键盘
+        setTimeout(() => {
+            input.focus();
+            input.click();
+        }, 100);
 
         // 高亮对应按钮
         document.getElementById('fMobileBtn')?.classList.toggle('active', mode === 'finals');
