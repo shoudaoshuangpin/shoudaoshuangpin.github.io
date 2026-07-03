@@ -236,6 +236,12 @@
             gap: 0.5rem;
             padding: 1rem;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .keyboard-container::-webkit-scrollbar {
+            display: none;
         }
 
         .keyboard-row {
@@ -627,6 +633,39 @@
             font-weight: 800;
             color: #f59e0b;
         }
+        .mobile-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+            left: -9999px;
+        }
+
+        .mobile-keyboard-btn {
+            display: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0.5rem auto;
+            transition: all 0.3s;
+        }
+
+        .mobile-keyboard-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .mobile-keyboard-btn.active {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            color: #0f172a;
+            font-weight: 600;
+        }
         .special-table {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -751,6 +790,7 @@
                         <div class="hint" id="fHint"></div>
                     </div>
                     <div class="feedback" id="fFeedback"></div>
+                    <button class="mobile-keyboard-btn" id="fMobileBtn" onclick="focusMobileInput('finals')">📱 点击唤起键盘</button>
                     <div class="controls">
                         <button class="btn primary" id="fStartBtn" onclick="startFinalsPractice()">开始练习</button>
                         <button class="btn" onclick="resetFinals()">重置</button>
@@ -782,6 +822,7 @@
                         <div class="answer-slot" id="sSlot2">?</div>
                     </div>
                     <div class="feedback" id="sFeedback"></div>
+                    <button class="mobile-keyboard-btn" id="sMobileBtn" onclick="focusMobileInput('shuangpin')">📱 点击唤起键盘</button>
                     <div class="controls">
                         <button class="btn primary" id="sStartBtn" onclick="startShuangpinPractice()">开始练习</button>
                         <button class="btn" onclick="resetShuangpin()">重置</button>
@@ -1062,7 +1103,6 @@
 
         // 阻止默认行为，防止输入法拦截
         e.preventDefault();
-        e.stopPropagation();
 
         // 韵母练习
         if (practiceState.finals.active) {
@@ -1211,6 +1251,10 @@
         // 输入过程中：方框实时显示用户输入的键，带高亮动画
         const slotIdx = state.input.length; // 1 or 2
         const slot = document.getElementById(`sSlot${slotIdx}`);
+        if (!slot) {
+            console.error('Slot not found:', `sSlot${slotIdx}`);
+            return;
+        }
         slot.textContent = key;
         slot.className = 'answer-slot filled';
 
@@ -1327,7 +1371,71 @@
         document.getElementById('combo').classList.remove('show');
     }
 
-    // ==================== 统计 ====================
+    // ==================== 移动端输入支持 ====================
+    let mobileInputMode = null;
+
+    function focusMobileInput(mode) {
+        mobileInputMode = mode;
+        const input = document.getElementById('mobileInput');
+        input.value = '';
+        input.focus();
+
+        // 高亮对应按钮
+        document.getElementById('fMobileBtn')?.classList.toggle('active', mode === 'finals');
+        document.getElementById('sMobileBtn')?.classList.toggle('active', mode === 'shuangpin');
+    }
+
+    function handleMobileInput(e) {
+        const input = e.target;
+        const val = input.value;
+        if (!val) return;
+
+        // 处理所有输入的字符（支持快速连续输入）
+        for (let i = 0; i < val.length; i++) {
+            const key = val[i].toUpperCase();
+            if (!/^[A-Z]$/.test(key)) continue;
+
+            flashKey(key);
+
+            if (mobileInputMode === 'finals' && practiceState.finals.active) {
+                checkFinalsAnswer(key);
+            } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
+                handleShuangpinInput(key);
+            }
+        }
+
+        input.value = '';
+    }
+
+    function handleMobileKeydown(e) {
+        // 在 mobileInput 上监听 keydown，作为 input 事件的补充
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        const key = e.key;
+        if (!key || key.length !== 1 || !/^[a-zA-Z]$/.test(key)) return;
+
+        e.preventDefault();
+        const upperKey = key.toUpperCase();
+
+        flashKey(upperKey);
+
+        if (mobileInputMode === 'finals' && practiceState.finals.active) {
+            checkFinalsAnswer(upperKey);
+        } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
+            handleShuangpinInput(upperKey);
+        }
+    }
+
+    // 监听移动端输入
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileInput = document.getElementById('mobileInput');
+        if (mobileInput) {
+            mobileInput.addEventListener('input', handleMobileInput);
+            mobileInput.addEventListener('keydown', handleMobileKeydown);
+        }
+    });
+
+        // ==================== 统计 ====================
     function saveGlobalStats(correct) {
         globalStats.total++;
         if (correct) globalStats.correct++;
@@ -1374,5 +1482,6 @@
     // 启动
     init();
     </script>
+    <input type="text" id="mobileInput" class="mobile-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
 </body>
 </html>
