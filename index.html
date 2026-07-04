@@ -236,12 +236,20 @@
             gap: 0.5rem;
             padding: 1rem;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .keyboard-container::-webkit-scrollbar {
+            display: none;
         }
 
         .keyboard-row {
             display: flex;
             gap: 0.4rem;
             justify-content: center;
+            width: fit-content;
+            margin: 0 auto;
         }
 
         .key {
@@ -627,6 +635,41 @@
             font-weight: 800;
             color: #f59e0b;
         }
+        .mobile-input {
+            position: fixed;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .mobile-keyboard-btn {
+            display: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0.5rem auto;
+            transition: all 0.3s;
+        }
+
+        .mobile-keyboard-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .mobile-keyboard-btn.active {
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            color: #0f172a;
+            font-weight: 600;
+        }
         .special-table {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -660,56 +703,6 @@
             margin-top: 0.25rem;
             font-family: monospace;
         }
-    
-        .comparison-table-wrapper {
-            overflow-x: auto;
-            margin-top: 1rem;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-
-        .comparison-table thead th {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--accent);
-            font-weight: 600;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
-        }
-
-        .comparison-table tbody td {
-            padding: 0.7rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.08);
-            color: var(--text-secondary);
-        }
-
-        .comparison-table tbody tr:hover {
-            background: rgba(56, 189, 248, 0.05);
-        }
-
-        .comparison-table tbody tr.highlight-row {
-            background: rgba(56, 189, 248, 0.1);
-        }
-
-        .comparison-table tbody tr.highlight-row td {
-            color: var(--text-primary);
-        }
-
-        .comparison-table tbody tr.highlight-row td:first-child {
-            color: var(--accent);
-        }
-
-        .comparison-table tbody td:first-child {
-            text-align: left;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
     </style>
 </head>
 <body>
@@ -737,71 +730,8 @@
         <!-- 首页 -->
         <section id="home" class="section active">
             <div class="hero">
-                <h1>首道双拼 — 当量更低，手感更好</h1>
-                
-            </div>
-
-            <div class="card">
-                <div class="card-title"><span class="icon">🖥️</span> 支持首道双拼的输入法</div>
-                <div class="info-box">
-                    <strong>目前内置首道双拼的输入法：</strong>万象拼音、落格输入法、老实输入法<br><br>
-                    <strong>其他输入法配置：</strong>请参阅 <a href="https://baijiahao.baidu.com/s?id=1869292731870927525&wfr=spider&for=pc" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;">首道双拼配置教程</a> 进行手动配置。
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title"><span class="icon">📊</span> 双拼方案当量对比</div>
-                <div class="info-box">
-                    当量越低，说明击键效率越高。首道双拼在单字和连续输入场景下均表现优异。
-                </div>
-                <div class="comparison-table-wrapper">
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>双拼方案</th>
-                                <th>单字当量</th>
-                                <th>连续当量</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="highlight-row">
-                                <td><strong>首道双拼</strong></td>
-                                <td><strong>13.03/10</strong></td>
-                                <td><strong>13.70/10</strong></td>
-                            </tr>
-                            <tr>
-                                <td>自然码</td>
-                                <td>13.67/10</td>
-                                <td>13.82/10</td>
-                            </tr>
-                            <tr>
-                                <td>小鹤双拼</td>
-                                <td>13.57/10</td>
-                                <td>13.82/10</td>
-                            </tr>
-                            <tr>
-                                <td>拼音加加</td>
-                                <td>13.59/10</td>
-                                <td>13.85/10</td>
-                            </tr>
-                            <tr>
-                                <td>搜狗双拼</td>
-                                <td>13.67/10</td>
-                                <td>13.86/10</td>
-                            </tr>
-                            <tr>
-                                <td>微软拼音</td>
-                                <td>13.67/10</td>
-                                <td>13.86/10</td>
-                            </tr>
-                            <tr>
-                                <td>智能ABC</td>
-                                <td>13.42/10</td>
-                                <td>13.87/10</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h1>掌握首道双拼，提升输入效率</h1>
+                <p>首道双拼是一种高效的中文输入方案，将全拼的多个字母压缩为两键。通过系统化的练习，你可以快速掌握键位，实现盲打。</p>
             </div>
 
             <div class="card">
@@ -864,6 +794,7 @@
                         <div class="hint" id="fHint"></div>
                     </div>
                     <div class="feedback" id="fFeedback"></div>
+                    <button class="mobile-keyboard-btn" id="fMobileBtn" onclick="focusMobileInput('finals')">📱 点击唤起键盘</button>
                     <div class="controls">
                         <button class="btn primary" id="fStartBtn" onclick="startFinalsPractice()">开始练习</button>
                         <button class="btn" onclick="resetFinals()">重置</button>
@@ -895,6 +826,7 @@
                         <div class="answer-slot" id="sSlot2">?</div>
                     </div>
                     <div class="feedback" id="sFeedback"></div>
+                    <button class="mobile-keyboard-btn" id="sMobileBtn" onclick="focusMobileInput('shuangpin')">📱 点击唤起键盘</button>
                     <div class="controls">
                         <button class="btn primary" id="sStartBtn" onclick="startShuangpinPractice()">开始练习</button>
                         <button class="btn" onclick="resetShuangpin()">重置</button>
@@ -1175,7 +1107,6 @@
 
         // 阻止默认行为，防止输入法拦截
         e.preventDefault();
-        e.stopPropagation();
 
         // 韵母练习
         if (practiceState.finals.active) {
@@ -1212,6 +1143,10 @@
         practiceState.finals.combo = 0;
         document.getElementById('fStartBtn').textContent = '练习中...';
         nextFinalsQuestion();
+        // 移动端自动唤起键盘
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            focusMobileInput('finals');
+        }
     }
 
     function nextFinalsQuestion() {
@@ -1285,6 +1220,10 @@
         document.getElementById('sStartBtn').textContent = '练习中...';
         resetShuangpinSlots();
         nextShuangpinQuestion();
+        // 移动端自动唤起键盘
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            focusMobileInput('shuangpin');
+        }
     }
 
     function resetShuangpinSlots() {
@@ -1324,6 +1263,10 @@
         // 输入过程中：方框实时显示用户输入的键，带高亮动画
         const slotIdx = state.input.length; // 1 or 2
         const slot = document.getElementById(`sSlot${slotIdx}`);
+        if (!slot) {
+            console.error('Slot not found:', `sSlot${slotIdx}`);
+            return;
+        }
         slot.textContent = key;
         slot.className = 'answer-slot filled';
 
@@ -1440,7 +1383,75 @@
         document.getElementById('combo').classList.remove('show');
     }
 
-    // ==================== 统计 ====================
+    // ==================== 移动端输入支持 ====================
+    let mobileInputMode = null;
+
+    function focusMobileInput(mode) {
+        mobileInputMode = mode;
+        const input = document.getElementById('mobileInput');
+        input.value = '';
+        // 延迟聚焦，避免按钮焦点冲突，确保移动端浏览器允许弹出键盘
+        setTimeout(() => {
+            input.focus();
+            input.click();
+        }, 100);
+
+        // 高亮对应按钮
+        document.getElementById('fMobileBtn')?.classList.toggle('active', mode === 'finals');
+        document.getElementById('sMobileBtn')?.classList.toggle('active', mode === 'shuangpin');
+    }
+
+    function handleMobileInput(e) {
+        const input = e.target;
+        const val = input.value;
+        if (!val) return;
+
+        // 处理所有输入的字符（支持快速连续输入）
+        for (let i = 0; i < val.length; i++) {
+            const key = val[i].toUpperCase();
+            if (!/^[A-Z]$/.test(key)) continue;
+
+            flashKey(key);
+
+            if (mobileInputMode === 'finals' && practiceState.finals.active) {
+                checkFinalsAnswer(key);
+            } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
+                handleShuangpinInput(key);
+            }
+        }
+
+        input.value = '';
+    }
+
+    function handleMobileKeydown(e) {
+        // 在 mobileInput 上监听 keydown，作为 input 事件的补充
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        const key = e.key;
+        if (!key || key.length !== 1 || !/^[a-zA-Z]$/.test(key)) return;
+
+        e.preventDefault();
+        const upperKey = key.toUpperCase();
+
+        flashKey(upperKey);
+
+        if (mobileInputMode === 'finals' && practiceState.finals.active) {
+            checkFinalsAnswer(upperKey);
+        } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
+            handleShuangpinInput(upperKey);
+        }
+    }
+
+    // 监听移动端输入
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileInput = document.getElementById('mobileInput');
+        if (mobileInput) {
+            mobileInput.addEventListener('input', handleMobileInput);
+            mobileInput.addEventListener('keydown', handleMobileKeydown);
+        }
+    });
+
+        // ==================== 统计 ====================
     function saveGlobalStats(correct) {
         globalStats.total++;
         if (correct) globalStats.correct++;
@@ -1487,5 +1498,6 @@
     // 启动
     init();
     </script>
+    <input type="text" id="mobileInput" class="mobile-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
 </body>
 </html>
