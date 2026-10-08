@@ -591,7 +591,14 @@
             .key { width: 42px; height: 58px; }
             .key .key-letter { font-size: 0.9rem; }
             .key .key-final { font-size: 0.6rem; }
-            .key .key-example { display: none; }
+            .key .key-example { display: block;          /* 不要隐藏 */
+								font-size: 0.55rem;      /* 更小一点 */
+								transform: scale(0.85);
+								margin-top: 1px;
+								line-height: 1; 
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: clip;}
             .key .key-initial { font-size: 0.6rem; }
         }
 
