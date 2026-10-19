@@ -269,10 +269,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        .key:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(56, 189, 248, 0.2);
-            border-color: var(--accent);
+        /* 仅在支持真实悬停的设备（电脑）上响应；触屏点按不残留抬起状态 */
+        @media (hover: hover) {
+            .key:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(56, 189, 248, 0.2);
+                border-color: var(--accent);
+            }
         }
 
         .key.pressed {
@@ -911,6 +914,178 @@
             height: 100%;
             background: linear-gradient(180deg, var(--accent), #818cf8);
         }
+
+        /* ===== 文章练习 ===== */
+        .article-intro {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.75;
+            margin-bottom: 1.2rem;
+        }
+        .article-current {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+            min-height: 96px;
+        }
+        .article-current-char {
+            font-size: 3.4rem;
+            font-weight: 700;
+            width: 88px;
+            height: 88px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(56, 189, 248, 0.08);
+            border: 2px solid var(--key-border);
+            color: var(--text-primary);
+        }
+        .article-text {
+            margin: 1.5rem 0;
+            padding: 1.25rem 1rem;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(56, 189, 248, 0.12);
+            font-size: 1.5rem;
+            line-height: 2.2;
+            letter-spacing: 1px;
+            word-break: break-word;
+            text-align: justify;
+            max-height: 340px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .art-char {
+            position: relative;
+            transition: color .2s, background .2s;
+            border-radius: 4px;
+            padding: 0 1px;
+        }
+        .art-char.correct { color: var(--correct); }
+        .art-char.wrong { color: var(--wrong); }
+        .art-char.current {
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.18);
+            box-shadow: 0 0 12px var(--accent-glow);
+            font-weight: 700;
+        }
+        .art-punct {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 480px) {
+            .article-current { gap: 1rem; min-height: 80px; }
+            .article-current-char { font-size: 2.6rem; width: 70px; height: 70px; }
+            .article-text { font-size: 1.35rem; line-height: 2.0; max-height: 300px; letter-spacing: 0.5px; }
+        }
+
+        /* ===== 手机小屏适配：键位图（字根图）=====
+           英文字母 → 左上角｜韵母 → 居中放大｜助记字 → 右上角｜声母 → 左下角 */
+        @media (max-width: 480px) {
+            /* 卡片留白收紧，给键盘腾出宽度 */
+            .card { padding: 1rem; }
+
+            /* 所有按键统一等宽（以最密的 10 键行反推单键宽度），键少的行居中，小屏无需横向滚动 */
+            .keyboard-container { padding: 0.5rem 0; gap: 0.3rem; }
+            .keyboard-row { width: 100%; gap: 3px; }
+            .key {
+                width: calc((100% - 27px) / 10);
+                min-width: 0;
+                height: 58px;
+                border-width: 1px;
+                border-radius: 7px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            }
+
+            /* 英文字母：左上角（暗化弱化为辅助信息，不抢韵母视觉） */
+            .key .key-letter {
+                position: absolute;
+                top: 3px;
+                left: 4px;
+                font-size: 0.58rem;
+                font-weight: 500;
+                line-height: 1;
+                color: var(--text-secondary);
+            }
+
+            /* 声母（sh/ch/zh）：右上角，字号加大（这三键无助记字，位置不冲突） */
+            .key .key-initial {
+                top: 3px;
+                right: 4px;
+                bottom: auto;
+                left: auto;
+                font-size: 0.75rem;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+            /* 韵母：居中放大，视觉主体 */
+            .key .key-final {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                padding: 0 1px;
+                font-size: clamp(0.78rem, 3.9vw, 1.05rem);
+                font-weight: 600;
+                line-height: 1.05;
+                white-space: nowrap;
+            }
+            /* 一键双韵母的键位，韵母字号收敛防止溢出 */
+            .key.multi .key-final {
+                font-size: clamp(0.58rem, 2.9vw, 0.74rem);
+            }
+
+            /* 助记字：右上角 */
+            .key .key-example {
+                position: absolute;
+                top: 3px;
+                right: 4px;
+                margin-top: 0;
+                font-size: 0.58rem;
+                line-height: 1;
+                transform: none;
+                white-space: nowrap;
+            }
+
+            /* 375px 等偏窄手机：声母字号略收敛，避免与左上角字母相碰 */
+            @media (max-width: 385px) {
+                .key .key-initial { font-size: 0.68rem; }
+            }
+
+            /* 超窄屏进一步收敛角标，避免字母与助记字相碰 */
+            @media (max-width: 360px) {
+                .key .key-letter { font-size: 0.54rem; left: 3px; }
+                .key .key-example { font-size: 0.54rem; right: 3px; }
+                .key .key-initial { font-size: 0.64rem; right: 3px; }
+            }
+
+            /* 320px 级老机型兜底 */
+            @media (max-width: 340px) {
+                .key .key-letter { font-size: 0.5rem; }
+                .key .key-example { font-size: 0.5rem; }
+                .key .key-initial { font-size: 0.56rem; }
+            }
+
+            /* 特殊零声母音节编码表：小屏紧凑显示，不沿用电脑端风格 */
+            .special-table {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+            }
+            .special-item {
+                padding: 0.5rem 0.35rem;
+                border-radius: 6px;
+            }
+            .special-pinyin { font-size: 0.9rem; }
+            .special-code { font-size: 0.75rem; margin-top: 0.15rem; }
+        }
     
     </style>
 </head>
@@ -924,14 +1099,14 @@
 
     <header>
         <div class="logo">
-            <div class="logo-icon">首</div>
+            <div class="logo-icon">道</div>
             <div class="logo-text">首道双拼练习</div>
         </div>
         <nav class="nav-tabs">
             <button class="nav-tab active" data-section="home">首页</button>
             <button class="nav-tab" data-section="keyboard">键位图</button>
             <button class="nav-tab" data-section="finals">韵母练习</button>
-            <button class="nav-tab" data-section="shuangpin">双拼练习</button>            <button class="nav-tab" data-section="stats">统计</button>
+            <button class="nav-tab" data-section="shuangpin">双拼练习</button><button class="nav-tab" data-section="article">文章练习</button>            <button class="nav-tab" data-section="stats">统计</button>
         </nav>
     </header>
 
@@ -1158,6 +1333,40 @@
                 </div>
             </div>
         </section>
+
+        <!-- 文章练习 -->
+        <section id="article" class="section">
+            <div class="card">
+                <div class="card-title"><span class="icon">📖</span> 文章练习 · 心的出口</div>
+                <div class="article-intro">
+                    跟着散文《心的出口》，用首道双拼逐一打出每个汉字：每个字只需两键（声母键 + 韵母键）。
+                    打对显示<span style="color:var(--correct)">绿色</span>，打错显示<span style="color:var(--wrong)">红色</span>并提示正确编码，标点符号自动跳过。
+                </div>
+                <div class="practice-area">
+                    <div class="stats-bar">
+                        <div class="stat-item"><div class="stat-value" id="aDone">0</div><div class="stat-label">已打</div></div>
+                        <div class="stat-item"><div class="stat-value" id="aCorrect">0</div><div class="stat-label">正确</div></div>
+                        <div class="stat-item"><div class="stat-value" id="aWrong">0</div><div class="stat-label">错误</div></div>
+                        <div class="stat-item"><div class="stat-value" id="aRate">0%</div><div class="stat-label">正确率</div></div>
+                    </div>
+                    <div class="article-current">
+                        <div class="article-current-char" id="aCurrentChar">点</div>
+                        <div class="answer-display" id="aAnswer">
+                            <div class="answer-slot" id="aSlot1">?</div>
+                            <div class="answer-slot" id="aSlot2">?</div>
+                        </div>
+                    </div>
+                    <div class="feedback" id="aFeedback"></div>
+                    <button class="mobile-keyboard-btn" id="aMobileBtn" onclick="focusMobileInput('article')">📱 点击唤起键盘</button>
+                    <div class="controls">
+                        <button class="btn primary" id="aStartBtn" onclick="startArticlePractice()">开始练习</button>
+                        <button class="btn" onclick="resetArticle()">重置</button>
+                    </div>
+                </div>
+                <div class="article-text" id="aText"></div>
+                <div class="keyboard-container" id="aKeyboard"></div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -1239,11 +1448,854 @@
         'shuang','pin','dao','shou','dao','shuang','pin','lai','feng','nian','mei','sou','dao','tuan','yang','qiu','wa','xie','hong','guai','ken','piao','zun','xiang','nian'
     ];
 
+    const articleData = [
+{'c':'在','code':'ZL'},
+{'c':'工','code':'GH'},
+{'c':'作','code':'ZO'},
+{'c':'或','code':'HO'},
+{'c':'学','code':'XL'},
+{'c':'习','code':'XI'},
+{'c':'中','code':'VH'},
+{'c':'遇','code':'YU'},
+{'c':'到','code':'DD'},
+{'c':'不','code':'BU'},
+{'c':'开','code':'KL'},
+{'c':'心','code':'XC'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'妨','code':'FY'},
+{'c':'静','code':'JG'},
+{'c':'下','code':'XK'},
+{'c':'来','code':'LL'},
+{'c':'好','code':'HD'},
+{'c':'好','code':'HD'},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'，','code':null},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'到','code':'DD'},
+{'c':'底','code':'DI'},
+{'c':'是','code':'EI'},
+{'c':'对','code':'DV'},
+{'c':'是','code':'EI'},
+{'c':'错','code':'CO'},
+{'c':'。','code':null},
+{'c':'生','code':'EF'},
+{'c':'活','code':'HO'},
+{'c':'中','code':'VH'},
+{'c':'不','code':'BU'},
+{'c':'是','code':'EI'},
+{'c':'你','code':'NI'},
+{'c':'对','code':'DV'},
+{'c':'别','code':'BR'},
+{'c':'人','code':'RK'},
+{'c':'好','code':'HD'},
+{'c':'，','code':null},
+{'c':'别','code':'BR'},
+{'c':'人','code':'RK'},
+{'c':'就','code':'JQ'},
+{'c':'该','code':'GL'},
+{'c':'对','code':'DV'},
+{'c':'你','code':'NI'},
+{'c':'好','code':'HD'},
+{'c':'，','code':null},
+{'c':'你','code':'NI'},
+{'c':'要','code':'YD'},
+{'c':'明','code':'MG'},
+{'c':'白','code':'BL'},
+{'c':'这','code':'VE'},
+{'c':'个','code':'GE'},
+{'c':'道','code':'DD'},
+{'c':'理','code':'LI'},
+{'c':'，','code':null},
+{'c':'每','code':'MM'},
+{'c':'个','code':'GE'},
+{'c':'人','code':'RK'},
+{'c':'都','code':'DS'},
+{'c':'有','code':'YS'},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'的','code':'DE'},
+{'c':'原','code':'YT'},
+{'c':'则','code':'ZE'},
+{'c':'，','code':null},
+{'c':'有','code':'YS'},
+{'c':'人','code':'RK'},
+{'c':'功','code':'GH'},
+{'c':'利','code':'LI'},
+{'c':'，','code':null},
+{'c':'有','code':'YS'},
+{'c':'人','code':'RK'},
+{'c':'善','code':'EJ'},
+{'c':'良','code':'LX'},
+{'c':'，','code':null},
+{'c':'你','code':'NI'},
+{'c':'不','code':'BU'},
+{'c':'可','code':'KE'},
+{'c':'能','code':'NF'},
+{'c':'要','code':'YD'},
+{'c':'求','code':'QQ'},
+{'c':'别','code':'BR'},
+{'c':'人','code':'RK'},
+{'c':'什','code':'EK'},
+{'c':'么','code':'ME'},
+{'c':'。','code':null},
+{'c':'有','code':'YS'},
+{'c':'时','code':'EI'},
+{'c':'间','code':'JN'},
+{'c':'的','code':'DE'},
+{'c':'话','code':'HW'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'妨','code':'FY'},
+{'c':'到','code':'DD'},
+{'c':'处','code':'IU'},
+{'c':'走','code':'ZS'},
+{'c':'走','code':'ZS'},
+{'c':'，','code':null},
+{'c':'在','code':'ZL'},
+{'c':'雄','code':'XH'},
+{'c':'伟','code':'WM'},
+{'c':'的','code':'DE'},
+{'c':'高','code':'GD'},
+{'c':'山','code':'EJ'},
+{'c':'之','code':'VI'},
+{'c':'间','code':'JN'},
+{'c':'，','code':null},
+{'c':'放','code':'FY'},
+{'c':'声','code':'EF'},
+{'c':'大','code':'DA'},
+{'c':'喊','code':'HJ'},
+{'c':'，','code':null},
+{'c':'一','code':'YI'},
+{'c':'吐','code':'TU'},
+{'c':'心','code':'XC'},
+{'c':'中','code':'VH'},
+{'c':'的','code':'DE'},
+{'c':'阴','code':'YC'},
+{'c':'郁','code':'YU'},
+{'c':'，','code':null},
+{'c':'在','code':'ZL'},
+{'c':'浪','code':'LY'},
+{'c':'漫','code':'MJ'},
+{'c':'的','code':'DE'},
+{'c':'大','code':'DA'},
+{'c':'海','code':'HL'},
+{'c':'之','code':'VI'},
+{'c':'间','code':'JN'},
+{'c':'，','code':null},
+{'c':'看','code':'KJ'},
+{'c':'潮','code':'ID'},
+{'c':'起','code':'QI'},
+{'c':'潮','code':'ID'},
+{'c':'落','code':'LO'},
+{'c':'，','code':null},
+{'c':'感','code':'GJ'},
+{'c':'悟','code':'WU'},
+{'c':'人','code':'RK'},
+{'c':'生','code':'EF'},
+{'c':'的','code':'DE'},
+{'c':'起','code':'QI'},
+{'c':'伏','code':'FU'},
+{'c':'跌','code':'DR'},
+{'c':'宕','code':'DY'},
+{'c':'，','code':null},
+{'c':'在','code':'ZL'},
+{'c':'落','code':'LO'},
+{'c':'日','code':'RI'},
+{'c':'余','code':'YU'},
+{'c':'晖','code':'HV'},
+{'c':'中','code':'VH'},
+{'c':'感','code':'GJ'},
+{'c':'受','code':'ES'},
+{'c':'天','code':'TN'},
+{'c':'地','code':'DI'},
+{'c':'的','code':'DE'},
+{'c':'宁','code':'NG'},
+{'c':'静','code':'JG'},
+{'c':'，','code':null},
+{'c':'洗','code':'XI'},
+{'c':'涤','code':'DI'},
+{'c':'心','code':'XC'},
+{'c':'中','code':'VH'},
+{'c':'的','code':'DE'},
+{'c':'贪','code':'TJ'},
+{'c':'念','code':'NN'},
+{'c':'。','code':null},
+{'c':'当','code':'DY'},
+{'c':'你','code':'NI'},
+{'c':'遭','code':'ZD'},
+{'c':'遇','code':'YU'},
+{'c':'失','code':'EI'},
+{'c':'恋','code':'LN'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'要','code':'YD'},
+{'c':'太','code':'TL'},
+{'c':'悲','code':'BM'},
+{'c':'伤','code':'EY'},
+{'c':'，','code':null},
+{'c':'失','code':'EI'},
+{'c':'去','code':'QU'},
+{'c':'的','code':'DE'},
+{'c':'并','code':'BG'},
+{'c':'非','code':'FM'},
+{'c':'能','code':'NF'},
+{'c':'忘','code':'WY'},
+{'c':'记','code':'JI'},
+{'c':'，','code':null},
+{'c':'拥','code':'YH'},
+{'c':'有','code':'YS'},
+{'c':'的','code':'DE'},
+{'c':'并','code':'BG'},
+{'c':'非','code':'FM'},
+{'c':'不','code':'BU'},
+{'c':'会','code':'HV'},
+{'c':'失','code':'EI'},
+{'c':'去','code':'QU'},
+{'c':'。','code':null},
+{'c':'那','code':'NA'},
+{'c':'些','code':'XR'},
+{'c':'缘','code':'YT'},
+{'c':'来','code':'LL'},
+{'c':'缘','code':'YT'},
+{'c':'去','code':'QU'},
+{'c':'都','code':'DS'},
+{'c':'只','code':'VI'},
+{'c':'是','code':'EI'},
+{'c':'人','code':'RK'},
+{'c':'生','code':'EF'},
+{'c':'的','code':'DE'},
+{'c':'一','code':'YI'},
+{'c':'个','code':'GE'},
+{'c':'瞬','code':'EZ'},
+{'c':'间','code':'JN'},
+{'c':'，','code':null},
+{'c':'而','code':'ER'},
+{'c':'人','code':'RK'},
+{'c':'生','code':'EF'},
+{'c':'里','code':'LI'},
+{'c':'那','code':'NA'},
+{'c':'些','code':'XR'},
+{'c':'大','code':'DA'},
+{'c':'段','code':'DT'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'间','code':'JN'},
+{'c':'，','code':null},
+{'c':'你','code':'NI'},
+{'c':'会','code':'HV'},
+{'c':'和','code':'HE'},
+{'c':'那','code':'NA'},
+{'c':'个','code':'GE'},
+{'c':'懂','code':'DH'},
+{'c':'你','code':'NI'},
+{'c':'，','code':null},
+{'c':'爱','code':'AI'},
+{'c':'你','code':'NI'},
+{'c':'，','code':null},
+{'c':'珍','code':'VK'},
+{'c':'惜','code':'XI'},
+{'c':'你','code':'NI'},
+{'c':'的','code':'DE'},
+{'c':'人','code':'RK'},
+{'c':'一','code':'YI'},
+{'c':'起','code':'QI'},
+{'c':'度','code':'DU'},
+{'c':'过','code':'GO'},
+{'c':'，','code':null},
+{'c':'好','code':'HD'},
+{'c':'好','code':'HD'},
+{'c':'珍','code':'VK'},
+{'c':'惜','code':'XI'},
+{'c':'在','code':'ZL'},
+{'c':'你','code':'NI'},
+{'c':'身','code':'EK'},
+{'c':'边','code':'BN'},
+{'c':'默','code':'MO'},
+{'c':'默','code':'MO'},
+{'c':'陪','code':'PM'},
+{'c':'着','code':'VE'},
+{'c':'你','code':'NI'},
+{'c':'的','code':'DE'},
+{'c':'人','code':'RK'},
+{'c':'。','code':null},
+{'c':'每','code':'MM'},
+{'c':'个','code':'GE'},
+{'c':'人','code':'RK'},
+{'c':'都','code':'DS'},
+{'c':'懂','code':'DH'},
+{'c':'得','code':'DE'},
+{'c':'这','code':'VE'},
+{'c':'个','code':'GE'},
+{'c':'道','code':'DD'},
+{'c':'理','code':'LI'},
+{'c':'，','code':null},
+{'c':'可','code':'KE'},
+{'c':'是','code':'EI'},
+{'c':'还','code':'HL'},
+{'c':'是','code':'EI'},
+{'c':'有','code':'YS'},
+{'c':'人','code':'RK'},
+{'c':'执','code':'VI'},
+{'c':'迷','code':'MI'},
+{'c':'不','code':'BU'},
+{'c':'悟','code':'WU'},
+{'c':'，','code':null},
+{'c':'苦','code':'KU'},
+{'c':'苦','code':'KU'},
+{'c':'执','code':'VI'},
+{'c':'着','code':'VO'},
+{'c':'于','code':'YU'},
+{'c':'那','code':'NA'},
+{'c':'个','code':'GE'},
+{'c':'无','code':'WU'},
+{'c':'缘','code':'YT'},
+{'c':'的','code':'DE'},
+{'c':'人','code':'RK'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'肯','code':'KK'},
+{'c':'放','code':'FY'},
+{'c':'手','code':'ES'},
+{'c':'，','code':null},
+{'c':'伤','code':'EY'},
+{'c':'了','code':'LE'},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'，','code':null},
+{'c':'苦','code':'KU'},
+{'c':'了','code':'LE'},
+{'c':'别','code':'BR'},
+{'c':'人','code':'RK'},
+{'c':'。','code':null},
+{'c':'爱','code':'AI'},
+{'c':'他','code':'TA'},
+{'c':'或','code':'HO'},
+{'c':'她','code':'TA'},
+{'c':'就','code':'JQ'},
+{'c':'让','code':'RY'},
+{'c':'那','code':'NA'},
+{'c':'份','code':'FK'},
+{'c':'美','code':'MM'},
+{'c':'好','code':'HD'},
+{'c':'的','code':'DE'},
+{'c':'记','code':'JI'},
+{'c':'忆','code':'YI'},
+{'c':'藏','code':'CY'},
+{'c':'在','code':'ZL'},
+{'c':'心','code':'XC'},
+{'c':'底','code':'DI'},
+{'c':'，','code':null},
+{'c':'我','code':'WO'},
+{'c':'们','code':'MK'},
+{'c':'都','code':'DS'},
+{'c':'是','code':'EI'},
+{'c':'在','code':'ZL'},
+{'c':'爱','code':'AI'},
+{'c':'的','code':'DE'},
+{'c':'挫','code':'CO'},
+{'c':'折','code':'VE'},
+{'c':'中','code':'VH'},
+{'c':'，','code':null},
+{'c':'逐','code':'VU'},
+{'c':'渐','code':'JN'},
+{'c':'成','code':'IF'},
+{'c':'长','code':'VY'},
+{'c':'起','code':'QI'},
+{'c':'来','code':'LL'},
+{'c':'，','code':null},
+{'c':'才','code':'CL'},
+{'c':'知','code':'VI'},
+{'c':'道','code':'DD'},
+{'c':'什','code':'EK'},
+{'c':'么','code':'ME'},
+{'c':'是','code':'EI'},
+{'c':'爱','code':'AI'},
+{'c':'，','code':null},
+{'c':'又','code':'YS'},
+{'c':'该','code':'GL'},
+{'c':'怎','code':'ZK'},
+{'c':'样','code':'YY'},
+{'c':'去','code':'QU'},
+{'c':'爱','code':'AI'},
+{'c':'。','code':null},
+{'c':'希','code':'XI'},
+{'c':'望','code':'WY'},
+{'c':'多','code':'DO'},
+{'c':'年','code':'NN'},
+{'c':'以','code':'YI'},
+{'c':'后','code':'HS'},
+{'c':'再','code':'ZL'},
+{'c':'次','code':'CI'},
+{'c':'相','code':'XX'},
+{'c':'遇','code':'YU'},
+{'c':'，','code':null},
+{'c':'还','code':'HL'},
+{'c':'能','code':'NF'},
+{'c':'洒','code':'SA'},
+{'c':'脱','code':'TO'},
+{'c':'的','code':'DE'},
+{'c':'说','code':'EO'},
+{'c':'一','code':'YI'},
+{'c':'句','code':'JU'},
+{'c':'，','code':null},
+{'c':'谢','code':'XR'},
+{'c':'谢','code':'XR'},
+{'c':'你','code':'NI'},
+{'c':'曾','code':'CF'},
+{'c':'经','code':'JG'},
+{'c':'爱','code':'AI'},
+{'c':'过','code':'GO'},
+{'c':'我','code':'WO'},
+{'c':'。','code':null},
+{'c':'当','code':'DY'},
+{'c':'你','code':'NI'},
+{'c':'的','code':'DE'},
+{'c':'婚','code':'HZ'},
+{'c':'姻','code':'YC'},
+{'c':'出','code':'IU'},
+{'c':'现','code':'XN'},
+{'c':'问','code':'WK'},
+{'c':'题','code':'TI'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'宽','code':'KT'},
+{'c':'容','code':'RH'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'理','code':'LI'},
+{'c':'解','code':'JR'},
+{'c':'，','code':null},
+{'c':'少','code':'ED'},
+{'c':'些','code':'XR'},
+{'c':'责','code':'ZE'},
+{'c':'骂','code':'MA'},
+{'c':'。','code':null},
+{'c':'婚','code':'HZ'},
+{'c':'姻','code':'YC'},
+{'c':'本','code':'BK'},
+{'c':'来','code':'LL'},
+{'c':'就','code':'JQ'},
+{'c':'是','code':'EI'},
+{'c':'两','code':'LX'},
+{'c':'个','code':'GE'},
+{'c':'人','code':'RK'},
+{'c':'的','code':'DE'},
+{'c':'事','code':'EI'},
+{'c':'，','code':null},
+{'c':'一','code':'YI'},
+{'c':'味','code':'WM'},
+{'c':'的','code':'DE'},
+{'c':'埋','code':'ML'},
+{'c':'怨','code':'YT'},
+{'c':'对','code':'DV'},
+{'c':'方','code':'FY'},
+{'c':'，','code':null},
+{'c':'根','code':'GK'},
+{'c':'本','code':'BK'},
+{'c':'不','code':'BU'},
+{'c':'能','code':'NF'},
+{'c':'解','code':'JR'},
+{'c':'决','code':'JL'},
+{'c':'任','code':'RK'},
+{'c':'何','code':'HE'},
+{'c':'问','code':'WK'},
+{'c':'题','code':'TI'},
+{'c':'。','code':null},
+{'c':'多','code':'DO'},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'曾','code':'CF'},
+{'c':'经','code':'JG'},
+{'c':'的','code':'DE'},
+{'c':'美','code':'MM'},
+{'c':'好','code':'HD'},
+{'c':'回','code':'HV'},
+{'c':'忆','code':'YI'},
+{'c':'，','code':null},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'两','code':'LX'},
+{'c':'人','code':'RK'},
+{'c':'同','code':'TH'},
+{'c':'吃','code':'II'},
+{'c':'一','code':'YI'},
+{'c':'碗','code':'WJ'},
+{'c':'面','code':'MN'},
+{'c':'的','code':'DE'},
+{'c':'艰','code':'JN'},
+{'c':'难','code':'NJ'},
+{'c':'日','code':'RI'},
+{'c':'子','code':'ZI'},
+{'c':'，','code':null},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'曾','code':'CF'},
+{'c':'经','code':'JG'},
+{'c':'心','code':'XC'},
+{'c':'里','code':'LI'},
+{'c':'的','code':'DE'},
+{'c':'感','code':'GJ'},
+{'c':'动','code':'DH'},
+{'c':'。','code':null},
+{'c':'试','code':'EI'},
+{'c':'着','code':'VE'},
+{'c':'做','code':'ZO'},
+{'c':'一','code':'YI'},
+{'c':'下','code':'XK'},
+{'c':'换','code':'HT'},
+{'c':'位','code':'WM'},
+{'c':'思','code':'SI'},
+{'c':'考','code':'KD'},
+{'c':'，','code':null},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'错','code':'CO'},
+{'c':'在','code':'ZL'},
+{'c':'哪','code':'NA'},
+{'c':'里','code':'LI'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'给','code':'GM'},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'，','code':null},
+{'c':'也','code':'YE'},
+{'c':'给','code':'GM'},
+{'c':'对','code':'DV'},
+{'c':'方','code':'FY'},
+{'c':'一','code':'YI'},
+{'c':'些','code':'XR'},
+{'c':'机','code':'JI'},
+{'c':'会','code':'HV'},
+{'c':'，','code':null},
+{'c':'人','code':'RK'},
+{'c':'都','code':'DS'},
+{'c':'会','code':'HV'},
+{'c':'有','code':'YS'},
+{'c':'缺','code':'QL'},
+{'c':'点','code':'DN'},
+{'c':'，','code':null},
+{'c':'错','code':'CO'},
+{'c':'误','code':'WU'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'包','code':'BD'},
+{'c':'容','code':'RH'},
+{'c':'，','code':null},
+{'c':'你','code':'NI'},
+{'c':'会','code':'HV'},
+{'c':'活','code':'HO'},
+{'c':'得','code':'DE'},
+{'c':'更','code':'GF'},
+{'c':'轻','code':'QG'},
+{'c':'松','code':'SH'},
+{'c':'。','code':null},
+{'c':'如','code':'RU'},
+{'c':'果','code':'GO'},
+{'c':'真','code':'VK'},
+{'c':'的','code':'DE'},
+{'c':'缘','code':'YT'},
+{'c':'尽','code':'JC'},
+{'c':'了','code':'LE'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'妨','code':'FY'},
+{'c':'轻','code':'QG'},
+{'c':'轻','code':'QG'},
+{'c':'的','code':'DE'},
+{'c':'放','code':'FY'},
+{'c':'开','code':'KL'},
+{'c':'手','code':'ES'},
+{'c':'，','code':null},
+{'c':'让','code':'RY'},
+{'c':'彼','code':'BI'},
+{'c':'此','code':'CI'},
+{'c':'都','code':'DS'},
+{'c':'留','code':'LQ'},
+{'c':'下','code':'XK'},
+{'c':'美','code':'MM'},
+{'c':'好','code':'HD'},
+{'c':'的','code':'DE'},
+{'c':'回','code':'HV'},
+{'c':'忆','code':'YI'},
+{'c':'，','code':null},
+{'c':'道','code':'DD'},
+{'c':'一','code':'YI'},
+{'c':'声','code':'EF'},
+{'c':'珍','code':'VK'},
+{'c':'重','code':'VH'},
+{'c':'再','code':'ZL'},
+{'c':'见','code':'JN'},
+{'c':'，','code':null},
+{'c':'如','code':'RU'},
+{'c':'果','code':'GO'},
+{'c':'不','code':'BU'},
+{'c':'能','code':'NF'},
+{'c':'做','code':'ZO'},
+{'c':'朋','code':'PF'},
+{'c':'友','code':'YS'},
+{'c':'，','code':null},
+{'c':'也','code':'YE'},
+{'c':'不','code':'BU'},
+{'c':'可','code':'KE'},
+{'c':'能','code':'NF'},
+{'c':'做','code':'ZO'},
+{'c':'敌','code':'DI'},
+{'c':'人','code':'RK'},
+{'c':'，','code':null},
+{'c':'就','code':'JQ'},
+{'c':'做','code':'ZO'},
+{'c':'那','code':'NA'},
+{'c':'个','code':'GE'},
+{'c':'熟','code':'EU'},
+{'c':'悉','code':'XI'},
+{'c':'的','code':'DE'},
+{'c':'陌','code':'MO'},
+{'c':'生','code':'EF'},
+{'c':'人','code':'RK'},
+{'c':'吧','code':'BA'},
+{'c':'。','code':null},
+{'c':'毕','code':'BI'},
+{'c':'竟','code':'JG'},
+{'c':'生','code':'EF'},
+{'c':'活','code':'HO'},
+{'c':'还','code':'HL'},
+{'c':'是','code':'EI'},
+{'c':'要','code':'YD'},
+{'c':'继','code':'JI'},
+{'c':'续','code':'XU'},
+{'c':'，','code':null},
+{'c':'我','code':'WO'},
+{'c':'们','code':'MK'},
+{'c':'还','code':'HL'},
+{'c':'要','code':'YD'},
+{'c':'继','code':'JI'},
+{'c':'续','code':'XU'},
+{'c':'寻','code':'XZ'},
+{'c':'找','code':'VD'},
+{'c':'那','code':'NA'},
+{'c':'个','code':'GE'},
+{'c':'有','code':'YS'},
+{'c':'缘','code':'YT'},
+{'c':'之','code':'VI'},
+{'c':'人','code':'RK'},
+{'c':'。','code':null},
+{'c':'当','code':'DY'},
+{'c':'你','code':'NI'},
+{'c':'和','code':'HE'},
+{'c':'孩','code':'HL'},
+{'c':'子','code':'ZI'},
+{'c':'出','code':'IU'},
+{'c':'现','code':'XN'},
+{'c':'问','code':'WK'},
+{'c':'题','code':'TI'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'妨','code':'FY'},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'的','code':'DE'},
+{'c':'青','code':'QG'},
+{'c':'春','code':'IZ'},
+{'c':'年','code':'NN'},
+{'c':'少','code':'ED'},
+{'c':'，','code':null},
+{'c':'想','code':'XX'},
+{'c':'想','code':'XX'},
+{'c':'那','code':'NA'},
+{'c':'些','code':'XR'},
+{'c':'无','code':'WU'},
+{'c':'知','code':'VI'},
+{'c':'的','code':'DE'},
+{'c':'轻','code':'QG'},
+{'c':'狂','code':'KX'},
+{'c':'岁','code':'SV'},
+{'c':'月','code':'YL'},
+{'c':'，','code':null},
+{'c':'我','code':'WO'},
+{'c':'们','code':'MK'},
+{'c':'都','code':'DS'},
+{'c':'是','code':'EI'},
+{'c':'从','code':'CH'},
+{'c':'年','code':'NN'},
+{'c':'轻','code':'QG'},
+{'c':'走','code':'ZS'},
+{'c':'过','code':'GO'},
+{'c':'来','code':'LL'},
+{'c':'的','code':'DE'},
+{'c':'。','code':null},
+{'c':'试','code':'EI'},
+{'c':'着','code':'VE'},
+{'c':'去','code':'QU'},
+{'c':'了','code':'LE'},
+{'c':'解','code':'JR'},
+{'c':'今','code':'JC'},
+{'c':'天','code':'TN'},
+{'c':'的','code':'DE'},
+{'c':'孩','code':'HL'},
+{'c':'子','code':'ZI'},
+{'c':'想','code':'XX'},
+{'c':'的','code':'DE'},
+{'c':'什','code':'EK'},
+{'c':'么','code':'ME'},
+{'c':'，','code':null},
+{'c':'喜','code':'XI'},
+{'c':'欢','code':'HT'},
+{'c':'什','code':'EK'},
+{'c':'么','code':'ME'},
+{'c':'，','code':null},
+{'c':'当','code':'DY'},
+{'c':'你','code':'NI'},
+{'c':'以','code':'YI'},
+{'c':'一','code':'YI'},
+{'c':'个','code':'GE'},
+{'c':'朋','code':'PF'},
+{'c':'友','code':'YS'},
+{'c':'的','code':'DE'},
+{'c':'身','code':'EK'},
+{'c':'份','code':'FK'},
+{'c':'去','code':'QU'},
+{'c':'了','code':'LE'},
+{'c':'解','code':'JR'},
+{'c':'他','code':'TA'},
+{'c':'们','code':'MK'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'你','code':'NI'},
+{'c':'就','code':'JQ'},
+{'c':'已','code':'YI'},
+{'c':'经','code':'JG'},
+{'c':'是','code':'EI'},
+{'c':'他','code':'TA'},
+{'c':'们','code':'MK'},
+{'c':'的','code':'DE'},
+{'c':'朋','code':'PF'},
+{'c':'友','code':'YS'},
+{'c':'了','code':'LE'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'沟','code':'GS'},
+{'c':'通','code':'TH'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'理','code':'LI'},
+{'c':'解','code':'JR'},
+{'c':'，','code':null},
+{'c':'多','code':'DO'},
+{'c':'些','code':'XR'},
+{'c':'包','code':'BD'},
+{'c':'容','code':'RH'},
+{'c':'，','code':null},
+{'c':'他','code':'TA'},
+{'c':'们','code':'MK'},
+{'c':'才','code':'CL'},
+{'c':'会','code':'HV'},
+{'c':'向','code':'XX'},
+{'c':'你','code':'NI'},
+{'c':'倾','code':'QG'},
+{'c':'诉','code':'SU'},
+{'c':'他','code':'TA'},
+{'c':'们','code':'MK'},
+{'c':'的','code':'DE'},
+{'c':'烦','code':'FJ'},
+{'c':'恼','code':'ND'},
+{'c':'，','code':null},
+{'c':'困','code':'KZ'},
+{'c':'惑','code':'HO'},
+{'c':'，','code':null},
+{'c':'迷','code':'MI'},
+{'c':'茫','code':'MY'},
+{'c':'。','code':null},
+{'c':'人','code':'RK'},
+{'c':'生','code':'EF'},
+{'c':'不','code':'BU'},
+{'c':'是','code':'EI'},
+{'c':'十','code':'EI'},
+{'c':'全','code':'QT'},
+{'c':'十','code':'EI'},
+{'c':'美','code':'MM'},
+{'c':'，','code':null},
+{'c':'当','code':'DY'},
+{'c':'你','code':'NI'},
+{'c':'的','code':'DE'},
+{'c':'心','code':'XC'},
+{'c':'觉','code':'JL'},
+{'c':'得','code':'DE'},
+{'c':'累','code':'LM'},
+{'c':'了','code':'LE'},
+{'c':'的','code':'DE'},
+{'c':'时','code':'EI'},
+{'c':'候','code':'HS'},
+{'c':'，','code':null},
+{'c':'不','code':'BU'},
+{'c':'妨','code':'FY'},
+{'c':'为','code':'WM'},
+{'c':'自','code':'ZI'},
+{'c':'己','code':'JI'},
+{'c':'的','code':'DE'},
+{'c':'心','code':'XC'},
+{'c':'找','code':'VD'},
+{'c':'一','code':'YI'},
+{'c':'个','code':'GE'},
+{'c':'出','code':'IU'},
+{'c':'口','code':'KS'},
+{'c':'。','code':null},
+{'c':'换','code':'HT'},
+{'c':'一','code':'YI'},
+{'c':'个','code':'GE'},
+{'c':'工','code':'GH'},
+{'c':'作','code':'ZO'},
+{'c':'，','code':null},
+{'c':'换','code':'HT'},
+{'c':'一','code':'YI'},
+{'c':'种','code':'VH'},
+{'c':'生','code':'EF'},
+{'c':'活','code':'HO'},
+{'c':'，','code':null},
+{'c':'也','code':'YE'},
+{'c':'换','code':'HT'},
+{'c':'一','code':'YI'},
+{'c':'种','code':'VH'},
+{'c':'对','code':'DV'},
+{'c':'待','code':'DL'},
+{'c':'生','code':'EF'},
+{'c':'活','code':'HO'},
+{'c':'的','code':'DE'},
+{'c':'态','code':'TL'},
+{'c':'度','code':'DU'},
+{'c':'。','code':null}
+];
+
     // ==================== 状态管理 ====================
     let currentSection = 'home';
     let practiceState = {
         finals: { active: false, current: null, total: 0, correct: 0, wrong: 0, combo: 0, maxCombo: 0 },
         shuangpin: { active: false, current: null, total: 0, correct: 0, wrong: 0, combo: 0, maxCombo: 0, input: [], processing: false },
+        article: { active: false, pos: 0, total: 0, correct: 0, wrong: 0, done: 0, input: [], processing: false, combo: 0, maxCombo: 0, typableTotal: 0 },
     };
 
     let globalStats = JSON.parse(localStorage.getItem('shoudao_stats') || JSON.stringify({
@@ -1257,6 +2309,8 @@
         renderSpecialTable();
         renderKeyboard('fKeyboard', false);
         renderKeyboard('sKeyboard', false);
+        renderKeyboard('aKeyboard', false);
+        buildArticleText();
         updateStatsDisplay();
 
         document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1318,7 +2372,7 @@
             row.forEach(k => {
                 const keyData = shoudaoData.keys.find(x => x.key === k);
                 const keyEl = document.createElement('div');
-                keyEl.className = 'key' + (keyData?.highlight ? ' highlight' : '');
+                keyEl.className = 'key' + (keyData?.highlight ? ' highlight' : '') + (keyData?.finals?.length > 1 ? ' multi' : '');
                 keyEl.dataset.key = k;
                 if (interactive) {
                     keyEl.title = getKeyTooltip(keyData);
@@ -1384,7 +2438,7 @@
         // Tab 切换导航
         if (e.key === 'Tab') {
             e.preventDefault();
-            const tabs = ['home','keyboard','finals','shuangpin','stats'];
+            const tabs = ['home','keyboard','finals','shuangpin','article','stats'];
             const idx = tabs.indexOf(currentSection);
             const next = tabs[(idx + 1) % tabs.length];
             switchSection(next);
@@ -1406,6 +2460,10 @@
         else if (currentSection === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
             flashKey(key);
             handleShuangpinInput(key);
+        }
+        else if (currentSection === 'article' && practiceState.article.active && !practiceState.article.processing) {
+            flashKey(key);
+            handleArticleInput(key);
         }
     }
 
@@ -1618,6 +2676,169 @@
         resetShuangpinSlots();
         clearKeyHighlights();
     }
+    // ==================== 文章练习 ====================
+    function buildArticleText() {
+        const container = document.getElementById('aText');
+        if (!container) return;
+        container.innerHTML = '';
+        practiceState.article.typableTotal = 0;
+        articleData.forEach((t, i) => {
+            const span = document.createElement('span');
+            span.textContent = t.c;
+            span.id = 'art-' + i;
+            if (t.code == null) {
+                span.className = 'art-punct';
+            } else {
+                span.className = 'art-char';
+                practiceState.article.typableTotal++;
+            }
+            container.appendChild(span);
+        });
+        updateArticleStats();
+    }
+
+    function firstTypableFrom(idx) {
+        for (let i = idx; i < articleData.length; i++) {
+            if (articleData[i].code != null) return i;
+        }
+        return -1;
+    }
+
+    function startArticlePractice() {
+        const st = practiceState.article;
+        st.active = true;
+        st.processing = false;
+        st.total = st.correct = st.wrong = st.done = 0;
+        st.combo = 0;
+        st.input = [];
+        // 清除上次着色与光标
+        document.querySelectorAll('.art-char').forEach(s => { s.className = 'art-char'; });
+        const first = firstTypableFrom(0);
+        document.getElementById('aStartBtn').textContent = '练习中...';
+        // 移动端自动唤起键盘
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            focusMobileInput('article');
+        }
+        setCurrentChar(first);
+        updateArticleStats();
+    }
+
+    function setCurrentChar(idx) {
+        const st = practiceState.article;
+        document.querySelectorAll('.art-char.current').forEach(s => s.classList.remove('current'));
+        if (idx < 0) {
+            st.active = false;
+            document.getElementById('aStartBtn').textContent = '开始练习';
+            document.getElementById('aCurrentChar').textContent = '✓';
+            document.getElementById('aFeedback').textContent = '🎉 全文完成！正确 ' + st.correct + ' / 共 ' + st.typableTotal;
+            document.getElementById('aFeedback').className = 'feedback correct';
+            document.getElementById('aSlot1').textContent = '';
+            document.getElementById('aSlot2').textContent = '';
+            document.getElementById('aSlot1').className = 'answer-slot';
+            document.getElementById('aSlot2').className = 'answer-slot';
+            return;
+        }
+        st.pos = idx;
+        const span = document.getElementById('art-' + idx);
+        if (span) {
+            span.classList.add('current');
+            if ('ontouchstart' in window) {
+                span.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+        document.getElementById('aCurrentChar').textContent = articleData[idx].c;
+        document.getElementById('aSlot1').textContent = '?';
+        document.getElementById('aSlot2').textContent = '?';
+        document.getElementById('aSlot1').className = 'answer-slot';
+        document.getElementById('aSlot2').className = 'answer-slot';
+        document.getElementById('aFeedback').textContent = '';
+        document.getElementById('aFeedback').className = 'feedback';
+    }
+
+    function handleArticleInput(key) {
+        const st = practiceState.article;
+        if (!st.active || st.processing) return;
+        const idx = st.pos;
+        if (idx < 0) return;
+
+        st.input.push(key);
+        const slotIdx = st.input.length;
+        const slot = document.getElementById('aSlot' + slotIdx);
+        if (slot) {
+            slot.textContent = key;
+            slot.className = 'answer-slot filled';
+        }
+
+        if (st.input.length === 2) {
+            st.processing = true;
+            st.total++;
+            const userAnswer = st.input.join('');
+            const correct = userAnswer === articleData[idx].code;
+            const span = document.getElementById('art-' + idx);
+
+            if (correct) {
+                st.correct++;
+                st.combo++;
+                showCombo(st.combo);
+                if (span) span.classList.add('correct');
+                document.getElementById('aFeedback').textContent = '✓ 正确';
+                document.getElementById('aFeedback').className = 'feedback correct';
+                document.getElementById('aSlot1').className = 'answer-slot correct';
+                document.getElementById('aSlot2').className = 'answer-slot correct';
+            } else {
+                st.wrong++;
+                st.combo = 0;
+                hideCombo();
+                if (span) span.classList.add('wrong');
+                document.getElementById('aFeedback').textContent = '✗ 错误 正确：' + articleData[idx].code;
+                document.getElementById('aFeedback').className = 'feedback wrong';
+                document.getElementById('aSlot1').textContent = articleData[idx].code[0];
+                document.getElementById('aSlot2').textContent = articleData[idx].code[1];
+                document.getElementById('aSlot1').className = 'answer-slot wrong';
+                document.getElementById('aSlot2').className = 'answer-slot wrong';
+            }
+
+            st.done++;
+            updateArticleStats();
+            saveGlobalStats(correct);
+
+            const next = firstTypableFrom(idx + 1);
+            setTimeout(() => {
+                st.input = [];
+                st.processing = false;
+                if (!st.active) return;
+                setCurrentChar(next);
+            }, correct ? 350 : 950);
+        }
+    }
+
+    function updateArticleStats() {
+        const st = practiceState.article;
+        document.getElementById('aDone').textContent = st.done;
+        document.getElementById('aCorrect').textContent = st.correct;
+        document.getElementById('aWrong').textContent = st.wrong;
+        document.getElementById('aRate').textContent = st.done ? Math.round(st.correct / st.done * 100) + '%' : '0%';
+    }
+
+    function resetArticle() {
+        const st = practiceState.article;
+        st.active = false;
+        st.processing = false;
+        st.input = [];
+        st.total = st.correct = st.wrong = st.done = 0;
+        st.combo = 0;
+        document.getElementById('aStartBtn').textContent = '开始练习';
+        document.getElementById('aCurrentChar').textContent = '点';
+        document.getElementById('aFeedback').textContent = '';
+        document.getElementById('aFeedback').className = 'feedback';
+        document.getElementById('aSlot1').textContent = '?';
+        document.getElementById('aSlot2').textContent = '?';
+        document.getElementById('aSlot1').className = 'answer-slot';
+        document.getElementById('aSlot2').className = 'answer-slot';
+        document.querySelectorAll('.art-char').forEach(s => { s.className = 'art-char'; });
+        updateArticleStats();
+    }
+
     // ==================== 工具函数 ====================
     function getShuangpinCode(pinyin) {
         // 零声母
@@ -1688,6 +2909,7 @@
         // 高亮对应按钮
         document.getElementById('fMobileBtn')?.classList.toggle('active', mode === 'finals');
         document.getElementById('sMobileBtn')?.classList.toggle('active', mode === 'shuangpin');
+        document.getElementById('aMobileBtn')?.classList.toggle('active', mode === 'article');
     }
 
     function handleMobileInput(e) {
@@ -1706,6 +2928,8 @@
                 checkFinalsAnswer(key);
             } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
                 handleShuangpinInput(key);
+            } else if (mobileInputMode === 'article' && practiceState.article.active && !practiceState.article.processing) {
+                handleArticleInput(key);
             }
         }
 
@@ -1728,6 +2952,8 @@
             checkFinalsAnswer(upperKey);
         } else if (mobileInputMode === 'shuangpin' && practiceState.shuangpin.active && !practiceState.shuangpin.processing) {
             handleShuangpinInput(upperKey);
+        } else if (mobileInputMode === 'article' && practiceState.article.active && !practiceState.article.processing) {
+            handleArticleInput(upperKey);
         }
     }
 
@@ -1746,7 +2972,8 @@
         if (correct) globalStats.correct++;
         else globalStats.wrong++;        const combos = [
             practiceState.finals.combo,
-            practiceState.shuangpin.combo
+            practiceState.shuangpin.combo,
+            practiceState.article.combo
         ];
         const currentMax = Math.max(...combos);
         if (currentMax > globalStats.maxCombo) {
@@ -1778,7 +3005,7 @@
 
     // 计时器
     setInterval(() => {
-        if (practiceState.finals.active || practiceState.shuangpin.active) {
+        if (practiceState.finals.active || practiceState.shuangpin.active || practiceState.article.active) {
             globalStats.totalTime = (globalStats.totalTime || 0) + 1;
             localStorage.setItem('shoudao_stats', JSON.stringify(globalStats));
         }
